@@ -118,31 +118,26 @@ class UserService:
 
 
     async def get_current_user(token:str = Depends(JWTBearer()),db:Session=Depends(get_db)):
-        try:
-            payload = decodeJWT(token)
-            user_email = payload.get('email')
-            if user_email is None:
-                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='Invalid Token')
+        
+        payload = decodeJWT(token)
+        user_email = payload.get('email')
+        if user_email is None:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='Invalid Token')
             
-            user = db.query(User).filter(User.email==user_email).first()
-            if not user:
-                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail='User not found')
-            if not user.is_active:
-                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail='User is not active')
+        user = db.query(User).filter(User.email==user_email).first()
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail='User not found')
             
-            user = {
+        user = {
                 'id':user.id,
                 'name':user.name,
                 'surname':user.surname,
                 'email':user.email,
+                'is_active':user.is_active,
                 'is_needer':user.is_needer,
                 'role':user.role
-            }
-            return user
-
-        except Exception as e:
-            print(e)
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not Authenticated")
+        }
+        return user
 
 
 class UserDocumentsService:

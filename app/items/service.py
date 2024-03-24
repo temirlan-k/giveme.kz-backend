@@ -27,9 +27,9 @@ class ItemService:
 
       async def create_item(item_file: UploadFile = File(...),category_id: int = Body(...),
                            db: Session = Depends(get_db),current_user: str = Depends(UserService.get_current_user)):
-            
-            if not current_user.get('is_active',False):
-                  raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Only verified user can upload items. Activate your account')
+            print(current_user.get('is_active'))
+            # if not current_user.get('is_active',False):
+            #       raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Only verified user can upload items. Activate your account')
             if category_id < 1 or category_id > db.query(Category).count():
                   raise HTTPException(status_code=400,detail='Error Category')
             
