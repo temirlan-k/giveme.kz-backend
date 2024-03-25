@@ -5,8 +5,9 @@ from app.config.settings import settings
 
 
 engine = create_engine(url=settings.POSTGRES_URL)
-SessionLocal = sessionmaker(autocommit=False,autoflush=False,bind=engine)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
+
 
 def get_db():
     db = SessionLocal()

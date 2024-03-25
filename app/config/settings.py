@@ -1,15 +1,17 @@
 import os
 from pydantic_settings import BaseSettings
-from decouple import config
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
 class Settings(BaseSettings):
 
-
-    #Security
-    SECRET_KEY: str = config("SECRET_KEY")
-    HASHING_ALGORITHM: str = config("HASHING_ALGORITHM")
+    SECRET_KEY: str = os.getenv("SECRET_KEY")
+    HASHING_ALGORITHM: str = os.getenv("HASHING_ALGORITHM")
 
     # DB Settings
-    DB_URL:str = config('DB_URL',cast=str)
+    DB_URL: str = os.getenv("DB_URL")
 
     class Config:
         env_file = ".env"
@@ -17,7 +19,7 @@ class Settings(BaseSettings):
 
     @property
     def POSTGRES_URL(self):
-        # url = f"postgresql://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_SERVER}:{self.DB_PORT}/{self.DB}"
         return self.DB_URL
-    
+
+
 settings = Settings()

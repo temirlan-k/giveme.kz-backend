@@ -1,16 +1,27 @@
 import uuid
 from enum import Enum
 from app.config.db import Base
-from sqlalchemy import Column, String, UUID, func, DateTime, Boolean,Enum as EnumType,ForeignKey
+from sqlalchemy import (
+    Column,
+    String,
+    UUID,
+    func,
+    DateTime,
+    Boolean,
+    Enum as EnumType,
+    ForeignKey,
+)
 from sqlalchemy.orm import relationship
 from app.orders.models import Order
+
+
 class UserRole(Enum):
-    USER = 'USER'
-    ADMIN = 'ADMIN'
+    USER = "USER"
+    ADMIN = "ADMIN"
 
 
 class User(Base):
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String(length=50), nullable=False)
@@ -26,5 +37,4 @@ class User(Base):
     orders = relationship("Order", back_populates="user")
 
     def __str__(self):
-        return f'#{self.id}:{self.name} {self.surname}'
-    
+        return f"#{self.id}:{self.name} {self.surname}"

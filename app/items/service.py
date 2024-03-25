@@ -1,70 +1,75 @@
 from typing import List
-import uuid
-import boto3
-
 from sqlalchemy.orm import Session
-from fastapi import BackgroundTasks, Body, Depends, HTTPException, Query, Request, status,UploadFile,File
-from decouple import config
-from fastapi.responses import JSONResponse
-
-from app.config.aws import S3Uploader
+from fastapi import (
+    Body,
+    Depends,
+    Form,
+    HTTPException,
+    status,
+    UploadFile,
+    File,
+)
+from app.config.aws import upload_item_photo
 from app.config.db import get_db
+from app.items.models import Item, Category
 from app.items.schemas import ItemCreate
-from app.items.models import Item,Category
 from app.items.utils import validate_file_size_type
-from decouple import config
 from app.users.service import UserService
-
-AWS_ACCESS_KEY=config("AWS_ACCESS_KEY",cast=str)
-AWS_SECRET_ACCESS_KEY=config("AWS_SECRET_ACCESS_KEY",cast=str)
-AWS_BUCKET_NAME=config("AWS_BUCKET_NAME",cast=str)
-AWS_REGION=config("AWS_REGION",cast=str)
-
-s3_uploader = S3Uploader(AWS_REGION,AWS_ACCESS_KEY,AWS_SECRET_ACCESS_KEY)
 
 
 class ItemService:
 
-      async def create_item(item_file: UploadFile = File(...),category_id: int = Body(...),
-                           db: Session = Depends(get_db),current_user: str = Depends(UserService.get_current_user)):
-            print(current_user.get('is_active'))
-            # if not current_user.get('is_active',False):
-            #       raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Only verified user can upload items. Activate your account')
-            if category_id < 1 or category_id > db.query(Category).count():
-                  raise HTTPException(status_code=400,detail='Error Category')
-            
-            await validate_file_size_type(item_file)
+    async def create_item(
+        file: UploadFile = File(...),
+        category_id: int = Form(...),
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(UserService.get_current_user),
+    ):
 
-            s3_db_key = await s3_uploader.upload_item_file(item_file)
+        await validate_file_size_type(file)
 
-            new_item = Item(
-                  image=s3_db_key,
-                  category_id=category_id,
-                  user_id=current_user.get('id')
+        try:
+
+            s3_db_key = await upload_item_photo(file)
+
+            db_item = Item(
+                image=s3_db_key, category_id=category_id, user_id=current_user.get("id")
             )
-            db.add(new_item)
+
+            db.add(db_item)
             db.commit()
-            db.refresh(new_item)
-            return {'success':True,'user':current_user.get('id'),'link':s3_db_key}
-      
+            db.refresh(db_item)
+            return {"success": True, "user": current_user.get("id"), "link": s3_db_key}
+        except Exception as e:
+            raise HTTPException(
+                status_code=500, detail=f"Failed to upload file: {str(e)}"
+            )
 
-      async def get_items_by_category(category_names: List[str] = None, db: Session = Depends(get_db)):
-            items_by_category = {}
+    async def get_items_by_category(
+        category_names: List[str] = None, db: Session = Depends(get_db)
+    ):
+        items_with_category_name = []
 
-            if category_names is None:
-                  return db.query(Item).all()
-            
+        if category_names is None:
+            items = db.query(Item).all()
+        else:
             for category_name in category_names:
-                  category = db.query(Category).filter(Category.name == category_name.upper()).first()
+                category = (
+                    db.query(Category)
+                    .filter(Category.name == category_name.upper())
+                    .first()
+                )
 
-                  if category is None:
-                        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Category {category_name} Not Found')
-                  
-                  items = db.query(Item).filter(Item.category_id==category.id).all()
-                  items_by_category[category.name] = [item for item in items]
+            if category is None:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Category {category_name} Not Found",
+                )
 
-            return items_by_category
+            items = db.query(Item).filter(Item.category_id == category.id).all()
+            for item in items:
+                item_dict = item.__dict__
+                item_dict["category_name"] = category_name
+                items_with_category_name.append(item_dict)
 
-      
-                        
-
+        return items_with_category_name

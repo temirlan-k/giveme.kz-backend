@@ -1,13 +1,24 @@
-from fastapi import HTTPException,status
+from fastapi import HTTPException, status
 import filetype
 
 
 async def validate_file_size_type(file):
-    FILE_SIZE = 2 * 1024 * 1024 # 2MB
+    FILE_SIZE = 2 * 1024 * 1024  # 2MB
 
-    accepted_file_types = ["image/png", "image/jpeg", "image/jpg", "image/heic", "image/heif", "image/heics", "png",
-                          "jpeg", "jpg", "heic", "heif", "heics" 
-                          ] 
+    accepted_file_types = [
+        "image/png",
+        "image/jpeg",
+        "image/jpg",
+        "image/heic",
+        "image/heif",
+        "image/heics",
+        "png",
+        "jpeg",
+        "jpg",
+        "heic",
+        "heif",
+        "heics",
+    ]
     file_info = filetype.guess(file.file)
     if file_info is None:
         raise HTTPException(
@@ -30,4 +41,7 @@ async def validate_file_size_type(file):
     for chunk in file.file:
         real_file_size += len(chunk)
         if real_file_size > FILE_SIZE:
-            raise HTTPException(status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail="Too large, max size - 2mb")
+            raise HTTPException(
+                status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                detail="Too large, max size - 2mb",
+            )
