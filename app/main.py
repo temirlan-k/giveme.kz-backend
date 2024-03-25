@@ -7,6 +7,7 @@ from app.config.settings import settings
 from app.orders.models import Order
 from app.users.routers import router as user_router
 from app.items.routers import router as items_router
+from app.orders.routers import router as order_router
 from app.users.models import User
 from app.items.models import Item, Category
 
@@ -25,6 +26,7 @@ admin.mount_to(app)
 # routers
 app.include_router(router=user_router)
 app.include_router(router=items_router)
+app.include_router(router=order_router)
 
 # CORS
 origins = ["*"]

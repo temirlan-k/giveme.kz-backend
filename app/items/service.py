@@ -2,7 +2,6 @@ import json
 from typing import List
 from sqlalchemy.orm import Session
 from fastapi import (
-    Body,
     Depends,
     Form,
     HTTPException,
@@ -52,7 +51,7 @@ class ItemService:
     async def get_items_by_category(category_names: List[str] = None, db: Session = Depends(get_db)):
             
             items_with_category_name = []
-            query = db.query(Item)
+            query = db.query(Item).filter(Item.is_publish==True)
 
             if category_names:
                   category_names_upper = [category_name.upper() for category_name in category_names]

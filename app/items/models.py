@@ -1,6 +1,6 @@
 import uuid
 from app.config.db import Base
-from sqlalchemy import Column, DateTime, String, ForeignKey, UUID, Integer, func
+from sqlalchemy import Boolean, Column, DateTime, String, ForeignKey, UUID, Integer, func
 from sqlalchemy.orm import relationship
 
 
@@ -21,6 +21,7 @@ class Item(Base):
     category_id = Column(Integer, ForeignKey("categories.id"))
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
     created_at_time = Column(DateTime, default=func.now())
+    is_publish = Column(Boolean,default=False)
     
     user = relationship("User", back_populates="items")
     category = relationship("Category", back_populates="items")

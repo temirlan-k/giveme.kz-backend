@@ -1,5 +1,4 @@
 import uuid
-from enum import Enum
 from app.config.db import Base
 
 from sqlalchemy import (
@@ -21,8 +20,7 @@ class Order(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
     item_id = Column(UUID(as_uuid=True), ForeignKey("items.id"))
-    first_name = Column(String(length=50), nullable=False)
-    last_name = Column(String(length=50), nullable=False)
+    contact_name = Column(String(length=50), nullable=False)
     address = Column(String(length=255), nullable=False)
     city = Column(String(length=100), nullable=False)
     phone_number = Column(String(length=20), nullable=False)
