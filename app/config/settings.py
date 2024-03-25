@@ -22,4 +22,5 @@ class Settings(BaseSettings):
         return self.DB_URL
 
 
+
 settings = Settings()

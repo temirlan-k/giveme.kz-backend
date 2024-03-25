@@ -61,3 +61,5 @@ async def read_current_user(
     current_user: CurrentUserOut = Depends(UserService.get_current_user),
 ):
     return current_user
+
+

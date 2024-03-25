@@ -3,11 +3,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette_admin.contrib.sqla import Admin, ModelView
 
 from app.config.db import get_db, engine
+from app.config.settings import settings
 from app.orders.models import Order
 from app.users.routers import router as user_router
 from app.items.routers import router as items_router
 from app.users.models import User
 from app.items.models import Item, Category
+
 
 app = FastAPI(title="GIVEme.kz", docs_url="/")
 
@@ -36,11 +38,6 @@ app.add_middleware(
 
 # checkpoint
 
-
-@app.get("/health", status_code=200, include_in_schema=False, tags="test")
-def health_check(db=Depends(get_db)):
-    """This is the health check endpoint"""
-    return {"status": "ok"}
 
 
 # if __name__ == "__main__":

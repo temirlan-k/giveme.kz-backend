@@ -21,6 +21,7 @@ class Item(Base):
     category_id = Column(Integer, ForeignKey("categories.id"))
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
     created_at_time = Column(DateTime, default=func.now())
+    
     user = relationship("User", back_populates="items")
     category = relationship("Category", back_populates="items")
     orders = relationship("Order", back_populates="item")

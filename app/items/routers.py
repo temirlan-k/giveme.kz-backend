@@ -34,3 +34,8 @@ async def create_item(
 @router.get("/items/")
 async def get_items(cat: List[str] = Query(None), db: Session = Depends(get_db)):
     return await ItemService.get_items_by_category(cat, db)
+
+
+@router.get('/items/my_items',dependencies=[Depends(JWTBearer())])
+async def get_user_items(db: Session = Depends(get_db),current_user : dict = Depends(UserService.get_current_user)):
+    return await ItemService.get_my_items(db,current_user)

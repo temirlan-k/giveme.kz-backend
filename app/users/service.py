@@ -11,6 +11,7 @@ from app.auth.email import (
     send_verification_email,
 )
 from app.config.db import get_db
+from app.items.models import Item
 from app.users.models import User
 from app.users.schemas import (
     ForgetPasswordRequest,
@@ -166,7 +167,6 @@ class UserService:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
             )
-
         user = {
             "id": user.id,
             "name": user.name,
@@ -177,6 +177,9 @@ class UserService:
             "role": user.role,
         }
         return user
+
+
+
 
 
 class UserDocumentsService:
