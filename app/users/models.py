@@ -19,6 +19,10 @@ class UserRole(Enum):
     USER = "USER"
     ADMIN = "ADMIN"
 
+    def __str__(self):
+        return self.value
+    
+
 
 class User(Base):
     __tablename__ = "users"
@@ -35,6 +39,21 @@ class User(Base):
 
     items = relationship("Item", back_populates="user")
     orders = relationship("Order", back_populates="user")
+    needer_files = relationship("UserNeederDocuments",back_populates='user')
 
     def __str__(self):
         return f"#{self.id}:{self.name} {self.surname}"
+
+
+class UserNeederDocuments(Base):
+    __tablename__ = 'needer_files'
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True),ForeignKey('users.id'))
+    needer_file = Column(String(255),nullable=False)
+    is_verified = Column(Boolean,default=False)
+
+    user = relationship("User", back_populates="needer_files")
+
+    def __str__(self):
+        return f'{self.user_id} - {self.is_verified}'

@@ -29,7 +29,7 @@ class OrderService:
                 city=create_order_dto.city,
                 address=create_order_dto.address,
                 user_id = current_user.get('id'),
-                item_id = create_order_dto.item_id
+                    item_id = create_order_dto.item_id
             )
             db.add(db_order)
             db.commit()
@@ -56,7 +56,7 @@ class OrderService:
                 "item": {
                     "id": item.id,
                     "image": item.image,
-                    "category_name": category.name  # Добавляем название категории
+                    "category_name": category.name  
                 }
             }
             orders.append(order_details)

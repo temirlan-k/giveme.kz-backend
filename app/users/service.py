@@ -10,9 +10,11 @@ from app.auth.email import (
     forget_password_request,
     send_verification_email,
 )
+from app.config.aws import upload_needer_file
 from app.config.db import get_db
 from app.items.models import Item
-from app.users.models import User
+from app.items.utils import validate_file_size_type
+from app.users.models import User, UserNeederDocuments
 from app.users.schemas import (
     ForgetPasswordRequest,
     ResetForgetPassword,
@@ -184,5 +186,27 @@ class UserService:
 
 class UserDocumentsService:
 
-    async def upload_documents(files: List[UploadFile] = File(...)):
-        return {"msg": "ok"}
+    async def upload_documents(files: List[UploadFile] = File(...), db: Session = Depends(get_db), current_user: dict = Depends(UserService.get_current_user)):
+        if len(files)!=3:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='You must upload all 3 files')
+        exception_query = db.query(UserNeederDocuments).filter(UserNeederDocuments.user_id==current_user.get('id')).first()
+        if exception_query is not None:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail='You already uploaded files')
+        
+        file_names = []
+        for file in files:
+            await validate_file_size_type(file)
+            s3_db_key = await upload_needer_file(file)
+            
+            db_needer_file = UserNeederDocuments(
+                user_id=current_user.get('id'),
+                needer_file=s3_db_key
+            )
+
+            db.add(db_needer_file)
+            file_names.append(file.filename)
+
+        db.commit()
+        db.refresh(db_needer_file)
+        success_response = {'success':True,'files':file_names,'user':db_needer_file.user_id}
+        return success_response

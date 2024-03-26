@@ -63,3 +63,7 @@ async def read_current_user(
     return current_user
 
 
+@router.post('/needer_files/upload',dependencies=[Depends(JWTBearer())],tags=['users'])
+async def upload_needer_files(files: List[UploadFile] = File(...),db : Session = Depends(get_db),current_user:dict = Depends(UserService.get_current_user)):
+    return await UserDocumentsService.upload_documents(files,db,current_user)
+

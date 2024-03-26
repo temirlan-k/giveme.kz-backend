@@ -10,7 +10,6 @@ class Settings(BaseSettings):
     SECRET_KEY: str = os.getenv("SECRET_KEY")
     HASHING_ALGORITHM: str = os.getenv("HASHING_ALGORITHM")
 
-    # DB Settings
     DB_URL: str = os.getenv("DB_URL")
 
     class Config:
