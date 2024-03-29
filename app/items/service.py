@@ -28,9 +28,12 @@ class ItemService:
         db: Session = Depends(get_db),
         current_user: dict = Depends(UserService.get_current_user),
     ):
-
+      
         await validate_file_size_type(file)
 
+        category = db.query(Category).filter(Category.id == category_id).first()
+        if not category:
+            raise HTTPException(status_code=400, detail="Category does not exist.")
         try:
 
             s3_db_key = await upload_item_photo(file)
