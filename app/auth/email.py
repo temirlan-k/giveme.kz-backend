@@ -46,7 +46,7 @@ async def send_verification_email(email: str, user_id: str):
     html_content_with_token = html_content.replace("{{token}}", token)
 
     msg = MIMEMultipart()
-    msg["From"] = "temirlan.kazhigerey@gmail.com"
+    msg["From"] = 'jooniof@gmail.com'
     msg["To"] = email
     msg["Subject"] = "GIVEME.kz Account Activation"
     msg.attach(MIMEText(html_content_with_token, "html"))
@@ -54,7 +54,7 @@ async def send_verification_email(email: str, user_id: str):
     try:
         with smtplib.SMTP(SMTP_SERVER, SMTP_SERVER_PORT) as smtp:
             smtp.starttls()
-            smtp.login(EMAIL_USERNAME, EMAIL_PASSWORD)
+            smtp.login('jooniof@gmail.com', 'ejcaummndgwtpwtb')
             smtp.send_message(msg)
 
     except Exception as e:
