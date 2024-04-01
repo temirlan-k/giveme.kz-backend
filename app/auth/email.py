@@ -32,6 +32,7 @@ async def decode_reset_password_token(token: str):
 
 
 async def send_verification_email(email: str, user_id: str):
+    print(EMAIL_USERNAME,EMAIL_PASSWORD)
     payload = {
         "email": email,
         "user_id": user_id,
@@ -46,7 +47,7 @@ async def send_verification_email(email: str, user_id: str):
     html_content_with_token = html_content.replace("{{token}}", token)
 
     msg = MIMEMultipart()
-    msg["From"] = 'jooniof@gmail.com'
+    msg["From"] = EMAIL_USERNAME
     msg["To"] = email
     msg["Subject"] = "GIVEME.kz Account Activation"
     msg.attach(MIMEText(html_content_with_token, "html"))
@@ -54,7 +55,7 @@ async def send_verification_email(email: str, user_id: str):
     try:
         with smtplib.SMTP(SMTP_SERVER, SMTP_SERVER_PORT) as smtp:
             smtp.starttls()
-            smtp.login('jooniof@gmail.com', 'ejcaummndgwtpwtb')
+            smtp.login(EMAIL_USERNAME,EMAIL_PASSWORD)
             smtp.send_message(msg)
 
     except Exception as e:

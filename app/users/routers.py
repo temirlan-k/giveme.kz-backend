@@ -35,7 +35,7 @@ async def login(login_dto: UserLogin = Body(...), db: Session = Depends(get_db))
     return await UserService.login_user(login_dto, db)
 
 
-@router.post("/activate_account/", tags=["auth"])
+@router.get("/activate_account/", tags=["auth"])
 async def activate_account(token: str = Header(None), db: Session = Depends(get_db)):
     return await UserService.activate_account(token, db)
 
