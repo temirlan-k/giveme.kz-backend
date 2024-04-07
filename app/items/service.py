@@ -72,7 +72,7 @@ class ItemService:
 
                         items = query.filter(Item.category_id == category_id).all()
                         items_with_category_name.extend(
-                        {**item.__dict__, "category_name": category_name.upper()} for item in items
+                        {**item.__dict__, "cat_name": category_name.upper()} for item in items
                         )
             else:
                   items = query.all()
