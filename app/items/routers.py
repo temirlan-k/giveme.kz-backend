@@ -23,12 +23,14 @@ router = APIRouter(tags=["items"])
 
 @router.post("/item/create", dependencies=[Depends(JWTBearer())])
 async def create_item(
-    item_file: UploadFile = File(...),
-    category_id: int = Form(...),
-    db: Session = Depends(get_db),
-    current_user=Depends(UserService.get_current_user),
-):
-    return await ItemService.create_item(item_file, category_id, db, current_user)
+        item_file: UploadFile = File(...),
+        category_id: int = Form(...),
+        contact_phone_number:str = Form(...),
+        contact_address:str = Form(...),
+        db: Session = Depends(get_db),
+        current_user: dict = Depends(UserService.get_current_user),
+        ):
+    return await ItemService.create_item(item_file, category_id,contact_phone_number,contact_address, db, current_user)
 
 
 @router.get("/items/")

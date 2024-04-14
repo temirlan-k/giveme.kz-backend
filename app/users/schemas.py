@@ -60,3 +60,27 @@ class CurrentUserOut(BaseModel):
     email: EmailStr
     is_needer: bool
     role: str
+
+
+class ChangePassword(BaseModel):
+    old_password: str = Field(..., alias="Old_password", max_length=64, min_length=8)
+    new_password: str = Field(..., alias="New_password", max_length=64, min_length=8)
+    confirm_password:str = Field(...,alias='Confirm_password',max_length=64, min_length=8)
+
+    @validator('confirm_password')
+    def validate_confirm_password(cls,v,values,**kwargs):
+        if 'new_password' in values and v!= values['new_password']:
+            raise ValueError("Passwords do not match")
+        return v
+
+    @validator("new_password")
+    def validate_new_password(cls, new_password):
+        if not any(char.isdigit() for char in new_password):
+            raise ValueError("Password must contain at least one digit")
+        if not any(char.isupper() for char in new_password):
+            raise ValueError("Password must contain at least one uppercase letter")
+        if not any(char.islower() for char in new_password):
+            raise ValueError("Password must contain at least one lowercase letter")
+        if all(char.isalnum() for char in new_password):
+            raise ValueError("Password must contain at least one special character")
+        return new_password

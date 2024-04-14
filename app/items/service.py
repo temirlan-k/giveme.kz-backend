@@ -21,25 +21,27 @@ from app.users.service import UserService
 
 
 class ItemService:
-
     async def create_item(
-        file: UploadFile = File(...),
+        item_file: UploadFile = File(...),
         category_id: int = Form(...),
+        contact_phone_number:str = Form(...),
+        contact_address:str = Form(...),
         db: Session = Depends(get_db),
         current_user: dict = Depends(UserService.get_current_user),
-    ):
-      
-        await validate_file_size_type(file)
-
+        ):
         category = db.query(Category).filter(Category.id == category_id).first()
         if not category:
             raise HTTPException(status_code=400, detail="Category does not exist.")
-        try:
 
-            s3_db_key = await upload_item_photo(file)
+        try:
+            s3_db_key = await upload_item_photo(item_file)
 
             db_item = Item(
-                image=s3_db_key, category_id=category_id, user_id=current_user.get("id")
+                image=s3_db_key,
+                category_id=category_id,
+                user_id=current_user.get("id"),
+                contact_phone_number=contact_phone_number,
+                contact_address=contact_address
             )
 
             db.add(db_item)
@@ -51,10 +53,42 @@ class ItemService:
                 status_code=500, detail=f"Failed to upload file: {str(e)}"
             )
 
+
+    # async def create_item(
+    #     file: UploadFile = File(...),
+    #     category_id: int = Form(...),
+    #     db: Session = Depends(get_db),
+    #     current_user: dict = Depends(UserService.get_current_user),
+    # ):
+      
+    #     await validate_file_size_type(file)
+
+    #     category = db.query(Category).filter(Category.id == category_id).first()
+    #     if not category:
+    #         raise HTTPException(status_code=400, detail="Category does not exist.")
+    #     try:
+
+    #         s3_db_key = await upload_item_photo(file)
+
+    #         db_item = Item(
+    #             image=s3_db_key,
+    #             category_id=category_id,
+    #             user_id=current_user.get("id")
+    #         )
+
+    #         db.add(db_item)
+    #         db.commit()
+    #         db.refresh(db_item)
+    #         return {"success": True, "user": current_user.get("id"), "link": s3_db_key}
+    #     except Exception as e:
+    #         raise HTTPException(
+    #             status_code=500, detail=f"Failed to upload file: {str(e)}"
+    #         )
+
     async def get_items_by_category(category_names: List[str] = None, db: Session = Depends(get_db)):
             
             items_with_category_name = []
-            query = db.query(Item).filter(Item.is_publish==True)
+            query = db.query(Item).filter(Item.status=="ACTIVE")
 
             if category_names:
                   category_names_upper = [category_name.upper() for category_name in category_names]
@@ -102,6 +136,7 @@ class ItemService:
             'image': item.image,  
             'category_name': category.name,
             'category_id': category.id,
-            'created_at_time':item.created_at_time
+            'created_at_time':item.created_at_time,
+            'status':item.status
         })
         return current_user_items

@@ -2,6 +2,7 @@ from typing import List
 import jwt
 from sqlalchemy.orm import Session
 from fastapi import Body, Depends, File, HTTPException, UploadFile, status
+from sqlalchemy import func
 
 from app.auth.auth_bearer import JWTBearer
 from app.auth.auth_handler import ALGORITHM, SECRET_KEY, decodeJWT, signJWT
@@ -16,6 +17,7 @@ from app.items.models import Item
 from app.items.utils import validate_file_size_type
 from app.users.models import User, UserNeederDocuments
 from app.users.schemas import (
+    ChangePassword,
     ForgetPasswordRequest,
     ResetForgetPassword,
     UserCreate,
@@ -29,10 +31,6 @@ from validate_email import validate_email
 class UserService:
 
     async def create_user(user_dto: UserCreate, db: Session = Depends(get_db)):
-
-        # is_valid_email = validate_email(user_dto.email, verify=True)
-        # if not is_valid_email:
-        #     raise HTTPException(status_code=400, detail="Invalid email address")
 
         user = db.query(User).filter(User.email == user_dto.email).first()
         if user:
@@ -153,6 +151,8 @@ class UserService:
                 detail="Something unexpected happened!",
             )
 
+
+
     async def get_current_user(
         token: str = Depends(JWTBearer()), db: Session = Depends(get_db)
     ):
@@ -165,6 +165,8 @@ class UserService:
             )
 
         user = db.query(User).filter(User.email == user_email).first()
+        total_bonuses = db.query(func.sum(Item.bonus)).filter(Item.user_id == user.id).scalar() or 0  
+
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
@@ -177,8 +179,30 @@ class UserService:
             "is_active": user.is_active,
             "is_needer": user.is_needer,
             "role": user.role,
+            "bar_code":user.bar_code,
+            "bonus_count":total_bonuses
         }
         return user
+    
+
+    async def change_password(passwords_dto:ChangePassword,db:Session=Depends(get_db),current_user:dict = Depends(get_current_user)):
+        user = db.query(User).filter(User.id==current_user.get('id')).first()
+
+        if user is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    
+        UserFactory._check_user_password(user, passwords_dto.old_password)
+
+        user.password_hash = Hash.hash_password(passwords_dto.new_password)
+        db.commit()
+        return {
+            'success':True,
+            'msg':'Password changed'
+        }
+            
+ 
+
+        
 
 
 

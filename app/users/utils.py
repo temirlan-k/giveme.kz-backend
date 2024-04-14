@@ -1,3 +1,4 @@
+import random
 from passlib.context import CryptContext
 
 
@@ -18,3 +19,7 @@ def validate_field_to_starts_with_uppercase(field):
     if field[0].islower():
         raise ValueError("Name and Surname must start with an uppercase letter")
     return field
+
+
+def generate_code():
+    return random.randint(100000000, 999999999)

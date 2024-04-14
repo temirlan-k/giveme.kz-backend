@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 from app.auth.auth_bearer import JWTBearer
 from app.config.db import get_db
 from app.users.schemas import (
+    ChangePassword,
     CurrentUserOut,
     ResetForgetPassword,
     UserCreate,
@@ -54,6 +55,10 @@ async def reset_password(
     db: Session = Depends(get_db),
 ):
     return await UserService.reset_password(token, rfp, db)
+
+@router.patch('/change_password',tags=['auth'])
+async def change_password(password_dto: ChangePassword = Body(...), db: Session = Depends(get_db),current_user: dict = Depends(UserService.get_current_user)):
+    return await UserService.change_password(password_dto,db,current_user)
 
 
 @router.get("/me", dependencies=[Depends(JWTBearer())], tags=["users"])

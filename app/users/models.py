@@ -10,9 +10,11 @@ from sqlalchemy import (
     Boolean,
     Enum as EnumType,
     ForeignKey,
+    Integer
 )
 from sqlalchemy.orm import relationship
 from app.orders.models import Order
+from app.users.utils import generate_code
 
 
 class UserRole(Enum):
@@ -36,6 +38,8 @@ class User(Base):
     is_active = Column(Boolean, default=False)
     is_needer = Column(Boolean, default=False)
     role = Column(EnumType(UserRole), default=UserRole.USER)
+
+    bar_code = Column(Integer, default=generate_code, unique=True)
 
     items = relationship("Item", back_populates="user")
     orders = relationship("Order", back_populates="user")
