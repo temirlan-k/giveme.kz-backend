@@ -137,6 +137,7 @@ class ItemService:
             'category_name': category.name,
             'category_id': category.id,
             'created_at_time':item.created_at_time,
-            'status':item.status
+            'status':item.status,
+            'bonus':item.bonus,
         })
         return current_user_items
