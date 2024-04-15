@@ -29,7 +29,10 @@ class ItemService:
         db: Session = Depends(get_db),
         current_user: dict = Depends(UserService.get_current_user),
         ):
+        
         category = db.query(Category).filter(Category.id == category_id).first()
+        if not current_user.get('is_active'):
+             raise HTTPException()
         if not category:
             raise HTTPException(status_code=400, detail="Category does not exist.")
 

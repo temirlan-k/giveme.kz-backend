@@ -1,4 +1,5 @@
 from typing import List
+from fastapi.responses import JSONResponse
 import jwt
 from sqlalchemy.orm import Session
 from fastapi import Body, Depends, File, HTTPException, UploadFile, status
@@ -191,14 +192,17 @@ class UserService:
         if user is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     
-        UserFactory._check_user_password(user, passwords_dto.old_password)
+        
+        if not Hash.verify_password(passwords_dto.old_password,user.password_hash):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid old password,try again")
 
         user.password_hash = Hash.hash_password(passwords_dto.new_password)
         db.commit()
-        return {
-            'success':True,
-            'msg':'Password changed'
-        }
+        return JSONResponse(status_code=status.HTTP_200_OK, content={
+        'success': True,
+        "status_code": status.HTTP_200_OK,
+        'msg': 'Password changed'
+        })
             
  
 

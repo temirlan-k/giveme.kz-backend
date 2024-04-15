@@ -72,9 +72,12 @@ class ChangePassword(BaseModel):
         if 'new_password' in values and v!= values['new_password']:
             raise ValueError("Passwords do not match")
         return v
+    
 
     @validator("new_password")
-    def validate_new_password(cls, new_password):
+    def validate_new_password(cls, new_password,values,**kwargs):
+        if new_password==values['old_password']:
+            raise ValueError('Old password and New password must be different')
         if not any(char.isdigit() for char in new_password):
             raise ValueError("Password must contain at least one digit")
         if not any(char.isupper() for char in new_password):
