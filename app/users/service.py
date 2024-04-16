@@ -25,7 +25,7 @@ from app.users.schemas import (
     UserLogin,
 )
 from app.users.factory.user_facroty import UserFactory
-from app.users.utils import Hash
+from app.users.utils import Hash, upload_and_validate_file
 from validate_email import validate_email
 
 
@@ -166,7 +166,12 @@ class UserService:
             )
 
         user = db.query(User).filter(User.email == user_email).first()
-        total_bonuses = db.query(func.sum(Item.bonus)).filter(Item.user_id == user.id).scalar() or 0  
+        total_bonuses = db.query(func.sum(Item.bonus)).filter(Item.user_id == user.id).scalar() or 0 
+        needer_status = db.query(UserNeederDocuments.status).filter(UserNeederDocuments.user_id == user.id).first()
+        if needer_status is not None:
+            needer_status = [status.name for status in needer_status]
+            print(needer_status[0])
+        
 
         if not user:
             raise HTTPException(
@@ -181,7 +186,8 @@ class UserService:
             "is_needer": user.is_needer,
             "role": user.role,
             "bar_code":user.bar_code,
-            "bonus_count":total_bonuses
+            "bonus_count":total_bonuses,
+            "needer_status":needer_status[0] if needer_status else 'NULL',
         }
         return user
     
@@ -213,28 +219,29 @@ class UserService:
 
 
 class UserDocumentsService:
+    
 
-    async def upload_documents(files: List[UploadFile] = File(...), db: Session = Depends(get_db), current_user: dict = Depends(UserService.get_current_user)):
-        if len(files)!=3:
+    async def upload_documents(electronic_doc: UploadFile, benefit_doc: UploadFile, user_photo: UploadFile, db: Session, current_user: dict):
+
+        if not all([electronic_doc, benefit_doc, user_photo]):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='You must upload all 3 files')
-        exception_query = db.query(UserNeederDocuments).filter(UserNeederDocuments.user_id==current_user.get('id')).first()
-        if exception_query is not None:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail='You already uploaded files')
-        
-        file_names = []
-        for file in files:
-            await validate_file_size_type(file)
-            s3_db_key = await upload_needer_file(file)
-            
-            db_needer_file = UserNeederDocuments(
-                user_id=current_user.get('id'),
-                needer_file=s3_db_key
-            )
 
-            db.add(db_needer_file)
-            file_names.append(file.filename)
+        electronic_id_url = await upload_and_validate_file(electronic_doc)
+        benefit_document_url = await upload_and_validate_file(benefit_doc)
+        user_photo_url = await upload_and_validate_file(user_photo)
 
+        db_needer_file = UserNeederDocuments(
+            user_id=current_user.get('id'),
+            electronic_id=electronic_id_url,
+            benefit_document=benefit_document_url,
+            user_photo=user_photo_url,
+        )
+
+        db.add(db_needer_file)
         db.commit()
-        db.refresh(db_needer_file)
-        success_response = {'success':True,'files':file_names,'user':db_needer_file.user_id}
+
+        success_response = {
+            'success': True,
+            'user': current_user.get('id')
+        }
         return success_response

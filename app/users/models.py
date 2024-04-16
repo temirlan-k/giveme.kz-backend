@@ -23,7 +23,16 @@ class UserRole(Enum):
 
     def __str__(self):
         return self.value
-    
+
+class DocumentStatus(Enum):
+    NULL = 'NULL'
+    ERROR = 'ERROR'
+    PENDING = 'PENDING'
+    SUCCESS = 'SUCCESS'
+        
+    def __str__(self):
+        return self.value
+
 
 
 class User(Base):
@@ -54,8 +63,11 @@ class UserNeederDocuments(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True),ForeignKey('users.id'))
-    needer_file = Column(String(255),nullable=False)
+    electronic_id = Column(String(255),nullable=False)
+    benefit_document = Column(String(255),nullable=False)
+    user_photo = Column(String(255),nullable=False)
     is_verified = Column(Boolean,default=False)
+    status = Column(EnumType(DocumentStatus),default=DocumentStatus.PENDING)
 
     user = relationship("User", back_populates="needer_files")
 
