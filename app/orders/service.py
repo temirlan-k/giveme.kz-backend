@@ -53,6 +53,7 @@ class OrderService:
                 "address": order.address,
                 "city": order.city,
                 "phone_number": order.phone_number,
+                "status":order.status,
                 "item": {
                     "id": item.id,
                     "image": item.image,

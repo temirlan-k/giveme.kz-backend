@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     HASHING_ALGORITHM: str = os.getenv("HASHING_ALGORITHM")
 
     DB_URL: str = os.getenv("DB_URL")
+    print(DB_URL)
 
     class Config:
         env_file = ".env"

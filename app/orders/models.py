@@ -1,3 +1,4 @@
+import enum
 import uuid
 from app.config.db import Base
 
@@ -13,6 +14,11 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 
+class OrderStatus(enum.Enum):
+    PENDING = "PENDING"
+    IN_DELIVERY="IN_DELIVERY"
+    COMPLETED="COMPLETED"
+
 
 class Order(Base):
     __tablename__ = "orders"
@@ -24,6 +30,8 @@ class Order(Base):
     address = Column(String(length=255), nullable=False)
     city = Column(String(length=100), nullable=False)
     phone_number = Column(String(length=20), nullable=False)
+    status = Column(EnumType(OrderStatus),default=OrderStatus.PENDING)
+    
 
     user = relationship("User", back_populates="orders")
     item = relationship("Item", back_populates="orders")

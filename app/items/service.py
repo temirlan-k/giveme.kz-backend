@@ -32,7 +32,7 @@ class ItemService:
         
         category = db.query(Category).filter(Category.id == category_id).first()
         if not current_user.get('is_active'):
-             raise HTTPException()
+             raise HTTPException(status_code=403,detail='You should active your account')
         if not category:
             raise HTTPException(status_code=400, detail="Category does not exist.")
 
