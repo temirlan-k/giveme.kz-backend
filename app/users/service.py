@@ -225,6 +225,9 @@ class UserDocumentsService:
 
         if not all([electronic_doc, benefit_doc, user_photo]):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='You must upload all 3 files')
+        user = db.query(User).filter(User.id==current_user.get('id')).first()
+        if user:
+            raise HTTPException(status_code=400,detail='You already uploaded files')
 
         electronic_id_url = await upload_and_validate_file(electronic_doc)
         benefit_document_url = await upload_and_validate_file(benefit_doc)
