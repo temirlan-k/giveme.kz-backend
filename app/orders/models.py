@@ -31,7 +31,7 @@ class Order(Base):
     city = Column(String(length=100), nullable=False)
     phone_number = Column(String(length=20), nullable=False)
     status = Column(EnumType(OrderStatus),default=OrderStatus.PENDING)
-    
+    created_at_time = Column(DateTime, default=func.now())
 
     user = relationship("User", back_populates="orders")
     item = relationship("Item", back_populates="orders")

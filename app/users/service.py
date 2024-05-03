@@ -46,9 +46,7 @@ class UserService:
         db.commit()
         db.refresh(new_user)
         user_email = str(new_user.email)
-
         await send_verification_email(user_email, str(new_user.id))
-
         return signJWT(user_email)
 
     async def login_user(login_dto: UserLogin, db: Session = Depends(get_db)) -> str:
