@@ -30,12 +30,11 @@ app.include_router(router=items_router)
 app.include_router(router=order_router)
 
 # CORS
-origins = ["http://localhost:3000","https://giveme-kz.vercel.app"]
+origins = ['*']
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods="*",
-    allow_headers="*",
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
-
