@@ -17,7 +17,8 @@ def token_response(access_token: str, refresh_token: str, msg: str = None):
 
 
 def signJWT(email: str) -> Dict[str, str]:
-    access_payload = {"email": email, "expires": time.time() + JWT_ACCESS_LIFETIME * 60}
+    access_payload = {"email": email, "expires": time.time() + JWT_ACCESS_LIFETIME * 60 * 60}
+    print(access_payload)
     refresh_payload = {
         "email": email,
         "expires": time.time() + JWT_REFRESH_LIFETIME * 24 * 60 * 60,

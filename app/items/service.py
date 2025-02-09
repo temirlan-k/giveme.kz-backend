@@ -9,7 +9,7 @@ from fastapi import (
     UploadFile,
     File,
 )
-from app.config.aws import upload_item_photo
+from app.config.aws import *
 from app.config.db import get_db
 from app.config.settings import settings
 from app.items.models import Item, Category
@@ -37,7 +37,7 @@ class ItemService:
             raise HTTPException(status_code=400, detail="Category does not exist.")
 
         try:
-            s3_db_key = await upload_item_photo(item_file)
+            s3_db_key = await upload_file_to_minio(item_file,'photos')
 
             db_item = Item(
                 image=s3_db_key,

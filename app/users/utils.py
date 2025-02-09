@@ -2,7 +2,7 @@ import random
 from fastapi import UploadFile
 from passlib.context import CryptContext
 
-from app.config.aws import upload_needer_file
+from app.config.aws import *
 from app.items.utils import validate_file_size_type
 
 
@@ -31,4 +31,4 @@ def generate_code():
 
 async def upload_and_validate_file(file: UploadFile):
     await validate_file_size_type(file)
-    return await upload_needer_file(file)
+    return await upload_file_to_minio(file, 'uploads')

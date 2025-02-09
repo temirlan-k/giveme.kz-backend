@@ -1,0 +1,61 @@
+services:
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
+      - SECRET_KEY=your_secret_key
+      - HASHING_ALGORITHM=HS256
+      - JWT_ACCESS_LIFETIME=2
+      - JWT_REFRESH_LIFETIME=7
+      - EMAIL_TOKEN_LIFETIME=1
+      - EMAIL_USERNAME=dalilamukan@gmail.com
+      - EMAIL_PASSWORD=tgbqohobzxklicuy 
+      - SMTP_SERVER=smtp.gmail.com
+      - SMTP_SERVER_PORT=587
+      - MINIO_ENDPOINT=http://minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+      - MINIO_BUCKET=uploads
+      - MINIO_PUBLIC_URL=http://localhost:6000
+
+
+  db:
+    image: postgres:16
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "6000:9000"
+      - "6001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_data:/data
+
+
+
+volumes:
+  postgres_data:
+  minio_data:
+  

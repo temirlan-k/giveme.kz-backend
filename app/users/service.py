@@ -12,7 +12,7 @@ from app.auth.email import (
     forget_password_request,
     send_verification_email,
 )
-from app.config.aws import upload_needer_file
+from app.config.aws import *
 from app.config.db import get_db
 from app.items.models import Item
 from app.items.utils import validate_file_size_type

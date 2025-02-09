@@ -5,21 +5,20 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-class Settings(BaseSettings):
+class Settings:
 
     SECRET_KEY: str = os.getenv("SECRET_KEY")
     HASHING_ALGORITHM: str = os.getenv("HASHING_ALGORITHM")
 
-    DB_URL: str = os.getenv("DB_URL")
+    DB_URL: str = 'postgresql://postgres:postgres@db:5432/postgres'
     print(DB_URL)
-
-    class Config:
-        env_file = ".env"
-        extra = "allow"
+    print(SECRET_KEY,HASHING_ALGORITHM)
 
     @property
     def POSTGRES_URL(self):
-        return self.DB_URL
+        print(self.SECRET_KEY,self.HASHING_ALGORITHM)
+
+        return "postgresql://postgres:postgres@db:5432/postgres"
 
 
 
