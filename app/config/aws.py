@@ -5,6 +5,8 @@ from botocore.client import ClientError
 from dotenv import load_dotenv
 from fastapi import HTTPException, UploadFile
 
+from app.items.utils import validate_file_size_type
+
 load_dotenv()
 
 # MinIO client

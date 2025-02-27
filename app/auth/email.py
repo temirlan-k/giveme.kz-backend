@@ -10,9 +10,9 @@ from email.mime.text import MIMEText
 
 load_dotenv()
 
-SECRET_KEY = os.getenv("SECRET_KEY")
-ALGORITHM = os.getenv("HASHING_ALGORITHM")
-EMAIL_TOKEN_LIFETIME = int(os.getenv("EMAIL_TOKEN_LIFETIME"))
+SECRET_KEY = "your_secret_key"
+ALGORITHM = "HS256"
+EMAIL_TOKEN_LIFETIME = 1
 EMAIL_USERNAME = os.getenv("EMAIL_USERNAME")
 SMTP_SERVER = os.getenv("SMTP_SERVER")
 SMTP_SERVER_PORT = int(os.getenv("SMTP_SERVER_PORT"))

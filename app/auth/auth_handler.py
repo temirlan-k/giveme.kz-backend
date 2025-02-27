@@ -6,10 +6,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-SECRET_KEY = os.getenv("SECRET_KEY")
-ALGORITHM = os.getenv("HASHING_ALGORITHM")
-JWT_ACCESS_LIFETIME = int(os.getenv("JWT_ACCESS_LIFETIME"))
-JWT_REFRESH_LIFETIME = int(os.getenv("JWT_REFRESH_LIFETIME"))
+SECRET_KEY = "your_secret_key"
+ALGORITHM = "HS256"
+JWT_ACCESS_LIFETIME = 60
+JWT_REFRESH_LIFETIME = 7
 
 
 def token_response(access_token: str, refresh_token: str, msg: str = None):
