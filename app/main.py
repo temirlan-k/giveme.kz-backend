@@ -14,6 +14,7 @@ from app.items.models import Item, Category
 
 app = FastAPI(title="GIVEme.kz", docs_url="/")
 
+print(settings.DB_URL)
 # admin
 # #TO-DO
 admin = Admin(engine, title="Admin Panel")

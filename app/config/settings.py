@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
 class Settings:
 
     SECRET_KEY = "your_secret_key"
@@ -15,6 +14,7 @@ class Settings:
 
     @property
     def POSTGRES_URL(self):
+        print(self.DB_URL)
         return self.DB_URL
 
 
