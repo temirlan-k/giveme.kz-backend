@@ -13,6 +13,14 @@ from app.items.models import Item, Category
 
 
 app = FastAPI(title="GIVEme.kz", docs_url="/")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 print(settings.DB_URL)
 # admin
@@ -31,11 +39,3 @@ app.include_router(router=items_router)
 app.include_router(router=order_router)
 
 # CORS
-origins = ['*']
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)

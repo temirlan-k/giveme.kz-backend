@@ -10,4 +10,4 @@ COPY . .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Make port 5001 available to the world outside this container
-CMD ["uvicorn" ,"app.main:app" ,"--host" ,"0.0.0.0" ,"--port" ,"5001" ,"--reload"]
+CMD ["uvicorn" ,"app.main:app" ,"--host" ,"0.0.0.0" ,"--port" ,"5001" ,"--reload","--forwarded-allow-ips=*"]
