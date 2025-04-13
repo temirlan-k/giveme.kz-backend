@@ -1,4 +1,5 @@
 import os
+import shutil
 import uuid
 import boto3
 from botocore.client import ClientError
@@ -9,6 +10,11 @@ from app.items.utils import validate_file_size_type
 
 load_dotenv()
 
+BASE_URL = os.getenv("BASE_URL", "https://givemekz-backend-production.up.railway.app")  # фронту отдаём полный путь
+UPLOAD_DIR = "uploads"
+
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
 # MinIO client
 minio_client = boto3.client(
     "s3",
@@ -18,24 +24,29 @@ minio_client = boto3.client(
     region_name=os.getenv("MINIO_REGION", "us-east-1"),
 )
 
-BUCKET_NAME = os.getenv("MINIO_BUCKET", "uploads")
 
-async def upload_file_to_minio(file: UploadFile, folder: str):
-    """Uploads a file to MinIO and returns the file URL."""
-    random_prefix = str(uuid.uuid4())
-    minio_key = f"{folder}/{random_prefix}_{file.filename}"
+async def save_file_locally(file: UploadFile, folder: str) -> str:
+    """Save uploaded file to uploads/<folder>/ and return public URL."""
+    ext = os.path.splitext(file.filename)[-1]
+    filename = f"{uuid.uuid4()}{ext}"
     
+    folder_path = os.path.join(UPLOAD_DIR, folder)
+    os.makedirs(folder_path, exist_ok=True)
+
+    file_path = os.path.join(folder_path, filename)
+
     try:
-        file.file.seek(0)
-        minio_client.upload_fileobj(file.file, BUCKET_NAME, minio_key)
-        file_url = f"{os.getenv('MINIO_PUBLIC_URL', 'http://localhost:9000')}/{BUCKET_NAME}/{minio_key}"
-        return file_url
-    except ClientError as e:
-        raise HTTPException(status_code=500, detail=f"Failed to upload file: {str(e)}")
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        return f"{BASE_URL}/uploads/{folder}/{filename}"
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to save file: {str(e)}")
+
 
 async def upload_and_validate_file(file: UploadFile, folder: str):
     await validate_file_size_type(file)
-    return await upload_file_to_minio(file, folder)
+    return await save_file_locally(file, folder)
+
 
 async def upload_needer_documents(electronic_doc: UploadFile, benefit_doc: UploadFile, user_photo: UploadFile):
     """Uploads multiple user documents to MinIO."""
@@ -52,3 +63,5 @@ async def upload_needer_documents(electronic_doc: UploadFile, benefit_doc: Uploa
         "benefit_doc": benefit_doc_url,
         "user_photo": user_photo_url,
     }
+
+

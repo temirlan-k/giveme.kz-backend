@@ -58,6 +58,22 @@ class UserService:
         UserFactory._check_user_password(user, login_dto.password)
         user_email = str(user.email)
         return signJWT(user_email)
+    
+
+    async def refresh_tokens(refresh_token: str):
+        try:
+            payload = decodeJWT(refresh_token)
+            if not payload:
+                raise HTTPException(status_code=401, detail="Invalid or expired refresh token")
+            
+            email = payload.get("email")
+            if email is None:
+                raise HTTPException(status_code=400, detail="Invalid token payload")
+            
+            return signJWT(email)
+        except Exception:
+            raise HTTPException(status_code=403, detail="Token refresh failed")
+
 
     async def activate_account(token: str, db: Session = Depends(get_db)) -> dict:
         try:
@@ -227,14 +243,14 @@ class UserDocumentsService:
         if user:
             raise HTTPException(status_code=400,detail='You already uploaded files')
 
-        electronic_id_url = await upload_and_validate_file(electronic_doc)
-        benefit_document_url = await upload_and_validate_file(benefit_doc)
-        user_photo_url = await upload_and_validate_file(user_photo)
+        electronic_doc_url = await upload_and_validate_file(electronic_doc, "user_documents")
+        benefit_doc_url = await upload_and_validate_file(benefit_doc, "benefit_documents")
+        user_photo_url = await upload_and_validate_file(user_photo, "user_photos")
 
         db_needer_file = UserNeederDocuments(
             user_id=current_user.get('id'),
-            electronic_id=electronic_id_url,
-            benefit_document=benefit_document_url,
+            electronic_id=electronic_doc_url,
+            benefit_document=benefit_doc_url,
             user_photo=user_photo_url,
         )
 

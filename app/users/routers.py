@@ -20,6 +20,7 @@ from app.users.schemas import (
     UserCreate,
     UserLogin,
     ForgetPasswordRequest,
+    RefreshToken,
 )
 from app.users.service import UserService, UserDocumentsService
 
@@ -34,6 +35,10 @@ async def signup(user_data: UserCreate = Body(...), db: Session = Depends(get_db
 @router.post("/login", tags=["auth"])
 async def login(login_dto: UserLogin = Body(...), db: Session = Depends(get_db)):
     return await UserService.login_user(login_dto, db)
+
+@router.post("/refresh", tags=["auth"])
+async def refresh(refresh_token: RefreshToken = Body(...),):
+    return await UserService.refresh_tokens(refresh_token.refresh)
 
 
 @router.get("/activate_account/", tags=["auth"])

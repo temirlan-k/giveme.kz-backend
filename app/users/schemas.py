@@ -36,6 +36,8 @@ class UserLogin(BaseModel):
     email: EmailStr = Field(..., alias="Email", min_length=4, max_length=320)
     password: str = Field(..., alias="Password", max_length=64, min_length=8)
 
+class RefreshToken(BaseModel):
+    refresh: str 
 
 class ForgetPasswordRequest(BaseModel):
     email: EmailStr = Field(..., alias="Email", min_length=4, max_length=320)

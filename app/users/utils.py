@@ -29,6 +29,3 @@ def generate_code():
     return random.randint(100000000, 999999999)
 
 
-async def upload_and_validate_file(file: UploadFile):
-    await validate_file_size_type(file)
-    return await upload_file_to_minio(file, 'uploads')

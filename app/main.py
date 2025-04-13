@@ -1,5 +1,6 @@
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from starlette_admin.contrib.sqla import Admin, ModelView
 
 from app.config.db import get_db, engine
@@ -38,4 +39,6 @@ app.include_router(router=user_router)
 app.include_router(router=items_router)
 app.include_router(router=order_router)
 
-# CORS
+# StaticFiles
+
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
