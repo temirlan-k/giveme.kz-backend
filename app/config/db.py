@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from app.config.settings import settings
 
 
-engine = create_engine(url=settings.POSTGRES_URL)
+engine = create_engine(url=settings.POSTGRES_URL,pool_pre_ping=True,connect_args={"timeout": 30})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
