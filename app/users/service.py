@@ -77,15 +77,8 @@ class UserService:
 
     async def activate_account(token: str, db: Session = Depends(get_db)) -> dict:
         try:
-            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-            user_id = payload.get("user_id", None)
-            if user_id is None:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="User ID not found in token",
-                )
-
-            user = db.query(User).filter(User.id == user_id).first()
+            payload: dict = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            user = db.query(User).filter(User.email == payload.get("email")).first()
             if not user:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
